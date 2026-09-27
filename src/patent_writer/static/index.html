@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>论文转中文专利说明书</title>
+  <style>
+    :root { color-scheme: light; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; color: #18304a; background: #f4f7fb; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header { background: #173b62; color: white; padding: 24px max(22px, calc((100vw - 1100px)/2)); }
+    h1 { font-size: 25px; margin: 0 0 7px; }
+    header p { margin: 0; color: #d9e6f2; line-height: 1.6; }
+    main { max-width: 1100px; margin: 24px auto 70px; padding: 0 18px; }
+    .panel { background: white; border: 1px solid #dbe3eb; border-radius: 12px; padding: 23px; margin-bottom: 18px; box-shadow: 0 3px 14px #173b620b; }
+    h2 { font-size: 19px; margin: 0 0 16px; }
+    h3 { font-size: 16px; margin: 20px 0 8px; }
+    p, li { line-height: 1.7; }
+    .muted { color: #64758a; }
+    .row { display: flex; gap: 12px; align-items: end; flex-wrap: wrap; }
+    .field { flex: 1 1 190px; min-width: 180px; }
+    label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    input, select, textarea { width: 100%; font: inherit; color: #18304a; border: 1px solid #bfcbd7; border-radius: 7px; padding: 10px 11px; background: white; }
+    input:focus, select:focus, textarea:focus { outline: 2px solid #9bc2e8; border-color: #3174ad; }
+    textarea { resize: vertical; min-height: 76px; line-height: 1.6; }
+    button, .download { display: inline-block; border: 0; border-radius: 7px; padding: 10px 16px; background: #1e659c; color: white; font: inherit; font-weight: 700; cursor: pointer; text-decoration: none; }
+    button:hover, .download:hover { background: #144f7d; }
+    button:disabled { background: #9cafbf; cursor: not-allowed; }
+    .secondary { background: #e8f0f7; color: #1a527e; }
+    .secondary:hover { background: #d6e6f3; }
+    .small { font-size: 13px; padding: 7px 11px; }
+    .notice { padding: 10px 13px; border-radius: 7px; background: #eaf3fa; margin: 13px 0; line-height: 1.6; }
+    .notice.warn { background: #fff3df; color: #79520b; }
+    .notice.error { background: #feeceb; color: #9f2921; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit,minmax(290px,1fr)); gap: 13px; }
+    .node-card { border: 1px solid #d8e1ea; border-radius: 8px; padding: 14px; background: #fbfdff; }
+    .node-card h3 { margin: 0 0 8px; }
+    .source-tag { display: inline-block; font-size: 12px; color: #376181; background: #e9f1f8; border-radius: 4px; padding: 2px 6px; margin: 3px 3px 0 0; }
+    .node-card .evidence { font-size: 12px; color: #66788b; margin-top: 8px; max-height: 72px; overflow: auto; }
+    .section-preview { border-top: 1px solid #e2e9ef; padding: 14px 0 2px; }
+    .section-preview h3 { margin-top: 0; }
+    .paragraph { line-height: 1.9; margin-bottom: 10px; }
+    .paragraph-content { white-space: pre-wrap; }
+    .draft-editor { margin: 8px 0; }
+    .plan-row { display: grid; grid-template-columns: 1fr 190px; gap: 12px; align-items: center; border-bottom: 1px solid #e7edf2; padding: 10px 0; }
+    .plan-row:last-child { border: 0; }
+    .plan-row select { min-width: 0; }
+    .downloads { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+    #sourceResults { max-height: 290px; overflow: auto; }
+    .source-item { border-bottom: 1px solid #e9edf1; padding: 8px 0; line-height: 1.5; }
+    .source-item strong { color: #1e659c; }
+    .evidence-item { border: 1px solid #d8e1ea; border-radius: 8px; padding: 14px; margin: 10px 0; background: #fff; }
+    .evidence-item p { margin: 7px 0; }
+    .verdict { display: inline-block; padding: 3px 8px; border-radius: 5px; font-size: 12px; font-weight: 700; margin-right: 7px; }
+    .verdict.supported { color: #155936; background: #e4f4e9; }
+    .verdict.partial, .verdict.uncertain { color: #7e550b; background: #fff1d6; }
+    .verdict.unsupported { color: #972d22; background: #fee8e5; }
+    .quote { padding: 9px 11px; background: #f3f7fa; border-left: 3px solid #a9bfd1; margin: 8px 0; white-space: pre-wrap; line-height: 1.55; }
+    .source-link { border: 0; background: transparent; color: #1e659c; padding: 0; font-size: 13px; text-decoration: underline; }
+    .candidate-row { display: flex; gap: 8px; align-items: center; margin: 7px 0; font-size: 13px; }
+    .candidate-row input { width: auto; }
+    [hidden] { display: none !important; }
+    @media(max-width:650px) { .plan-row { grid-template-columns: 1fr; } .panel { padding: 17px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>论文转中文专利说明书</h1>
+    <p>先核对论文中的技术事实，再生成可编辑草稿。每段都保留原文位置供你复核。</p>
+  </header>
+  <main>
+    <section class="panel">
+      <h2>1 选择论文</h2>
+      <div class="row">
+        <div class="field"><label for="pdfFile">科研论文 PDF</label><input id="pdfFile" type="file" accept=".pdf,application/pdf"></div>
+        <button id="uploadBtn">读取论文</button>
+      </div>
+      <div id="paperSummary" class="notice" hidden></div>
+      <div id="paperWarnings"></div>
+      <details id="sourceDetails" hidden>
+        <summary>查看论文原文位置</summary>
+        <p class="muted">输入技术词、原文块编号或页码，可以核对后续引用。</p>
+        <input id="sourceSearch" placeholder="搜索原文、B0001 或页码">
+        <div id="sourceResults"></div>
+      </details>
+    </section>
+
+    <section class="panel">
+      <h2>2 模型接口</h2>
+      <div class="row">
+        <div class="field"><label for="provider">接口类型</label><select id="provider"><option value="openai">兼容 OpenAI 的接口</option><option value="ollama">本机 Ollama</option></select></div>
+        <div class="field"><label for="baseUrl">基础地址</label><input id="baseUrl" value="https://api.deepseek.com" spellcheck="false"></div>
+        <div class="field"><label for="model">模型名</label><input id="model" value="deepseek-flash" spellcheck="false"></div>
+        <div class="field"><label for="apiKey">密钥</label><input id="apiKey" type="password" placeholder="只在本次页面中输入" autocomplete="off"></div>
+      </div>
+      <p class="muted">点击生成后，相关论文文本会发送到你填写的模型接口。密钥不会写入项目文件。</p>
+      <div class="row"><div class="field"><label for="planCount">提纲方案</label><select id="planCount"><option value="1">快速检查 1 份</option><option value="3" selected>标准检查 3 份</option><option value="5">充分检查 5 份</option></select></div></div>
+    </section>
+
+    <section class="panel" id="graphPanel" hidden>
+      <h2>3 核对技术概念</h2>
+      <p class="muted">请重点核对技术问题、方法步骤、数值和原文位置。修改后点击保存。</p>
+      <div class="row"><button id="graphBtn">提取概念</button><button id="saveGraphBtn" class="secondary" hidden>保存修改</button></div>
+      <div id="graphWarnings"></div>
+      <div id="graphCards" class="cards"></div>
+      <details style="margin-top:16px">
+        <summary>补充遗漏的技术概念</summary>
+        <div class="row" style="margin-top:12px">
+          <div class="field"><label for="newCategory">概念类型</label><select id="newCategory"><option value="Field">技术领域</option><option value="TechProblem">技术问题</option><option value="PriorArt">现有技术</option><option value="Novelty">区别特征</option><option value="Solution">核心方案</option><option value="Implementation">实现步骤</option><option value="Effects">技术效果</option><option value="Embodiment">实施例</option></select></div>
+          <div class="field"><label for="newSources">原文块编号</label><input id="newSources" placeholder="例如 B0012, B0035"></div>
+        </div>
+        <div class="field" style="margin:12px 0"><label for="newText">技术内容</label><textarea id="newText" placeholder="写清楚论文实际披露的事实"></textarea></div>
+        <button id="addNodeBtn" class="secondary small">加入概念</button>
+      </details>
+      <details id="edgeDetails" hidden><summary>查看技术关系</summary><div id="edgeList"></div></details>
+    </section>
+
+    <section class="panel" id="planPanel" hidden>
+      <h2>4 核对中文提纲</h2>
+      <p class="muted">说明书采用技术领域、背景技术、发明内容、具体实施方式的顺序；有经核对的附图时加入附图说明。</p>
+      <div class="row"><button id="planBtn">生成提纲</button><button id="savePlanBtn" class="secondary" hidden>保存章节调整</button></div>
+      <div id="planWarnings"></div>
+      <div id="planRows"></div>
+    </section>
+
+    <section class="panel" id="draftPanel" hidden>
+      <h2>5 生成说明书草稿</h2>
+      <p class="muted">页面预览中的 $...$ 为公式标记；下载 Word 后显示为可编辑的数学公式。</p>
+      <div class="row"><button id="draftBtn">生成 Word 草稿</button><button id="saveDraftBtn" class="secondary" hidden>保存正文修改</button></div>
+      <div id="draftWarnings"></div>
+      <div id="draftPreview"></div>
+      <div class="downloads" id="downloads" hidden>
+        <a class="download" data-kind="docx">下载 Word 草稿</a>
+        <a class="download secondary" data-kind="csv">下载证据对照表</a>
+        <a class="download secondary" data-kind="review">下载待确认事项</a>
+        <a class="download secondary" data-kind="markdown">下载纯文本草稿</a>
+      </div>
+    </section>
+    <section class="panel" id="evidencePanel" hidden>
+      <h2>6 逐条核对原文依据</h2>
+      <p class="muted">核对会把草稿原句拆成技术主张，只对照该段当前所引的原文。自动判断会保留引句、页码和原因；“当前引用不足”不代表论文其他位置没有依据。工具会从全文概念和表格中找待核对的补证候选，勾选前请先查看原文。公式可打开论文页面核对并记录结果。</p>
+      <div class="row"><button id="evidenceBtn">核对原文依据</button><div class="field"><label for="evidenceFilter">查看结果</label><select id="evidenceFilter"><option value="attention">先看待复核</option><option value="all">全部主张</option><option value="supported">有原文支持</option></select></div></div>
+      <div id="evidenceSummary" class="notice" hidden></div>
+      <div id="candidateActions" class="row" hidden><button id="applyCitationsBtn" class="secondary">把勾选的原文加入对应段落</button><span class="muted">加入后需重新运行证据核对。</span></div>
+      <div id="evidenceFindings"></div>
+      <div class="downloads" id="evidenceDownloads" hidden>
+        <a class="download secondary" data-kind="evidence_csv">下载逐条核对表</a>
+        <a class="download secondary" data-kind="evidence_json">下载核对数据</a>
+      </div>
+    </section>
+    <div id="statusBox" class="notice" hidden aria-live="polite"></div>
+  </main>
+  <script>
+    const $ = id => document.getElementById(id);
+    const state = {runId:null,source:null,graph:null,plan:null,draft:null,evidence:null,busy:false};
+    const labels = {Field:'技术领域',TechProblem:'技术问题',PriorArt:'现有技术',Novelty:'区别特征',Solution:'核心方案',Implementation:'实现步骤',Effects:'技术效果',Embodiment:'实施例',Figure:'附图'};
+    const headings = ['技术领域','背景技术','发明内容','附图说明','具体实施方式'];
+    const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const unique = values => [...new Set(values)];
+    const sleep = ms => new Promise(resolve => setTimeout(resolve,ms));
+    async function api(path, options={}) {
+      const response = await fetch(path,options);
+      const data = await response.json().catch(()=>({}));
+      if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : `请求失败（${response.status}）`);
+      return data;
+    }
+    function notice(message, kind='') {
+      $('statusBox').hidden=false;
+      $('statusBox').className='notice '+kind;
+      $('statusBox').textContent=message;
+    }
+    function warnings(target, values) {
+      $(target).innerHTML=(values||[]).map(v=>`<div class="notice warn">${esc(v)}</div>`).join('');
+    }
+    function refreshButtons() {
+      $('graphPanel').hidden=!state.runId;
+      $('planPanel').hidden=!state.graph;
+      $('draftPanel').hidden=!state.plan;
+      $('evidencePanel').hidden=!state.draft;
+      $('graphBtn').disabled=state.busy;
+      $('planBtn').disabled=state.busy;
+      $('draftBtn').disabled=state.busy;
+      $('evidenceBtn').disabled=state.busy;
+      $('uploadBtn').disabled=state.busy;
+      $('saveGraphBtn').disabled=state.busy;
+      $('savePlanBtn').disabled=state.busy;
+      $('saveDraftBtn').disabled=state.busy;
+    }
+    function renderSource() {
+      if (!state.source) return;
+      $('paperSummary').hidden=false;
+      $('paperSummary').textContent=`${state.source.filename} · ${state.source.page_count} 页 · ${state.source.blocks.length} 个原文块`;
+      warnings('paperWarnings',state.source.warnings);
+      $('sourceDetails').hidden=false;
+      searchSource();
+    }
+    function searchSource() {
+      if (!state.source) return;
+      const query=$('sourceSearch').value.trim().toLowerCase();
+      let blocks=state.source.blocks;
+      if (query) blocks=blocks.filter(b=>b.id.toLowerCase().includes(query)||String(b.page)===query||b.text.toLowerCase().includes(query));
+      $('sourceResults').innerHTML=blocks.slice(0,50).map(b=>`<div class="source-item"><strong>${esc(b.id)} · 第${b.page}页</strong><br>${esc(b.text)}</div>`).join('') || '<p class="muted">没有找到匹配内容。</p>';
+    }
+    function renderGraph() {
+      if (!state.graph) return;
+      const blockMap=Object.fromEntries(state.source.blocks.map(b=>[b.id,b]));
+      warnings('graphWarnings',state.graph.warnings);
+      $('graphCards').innerHTML=state.graph.nodes.map(n=>{
+        const snippets=n.source_ids.map(id=>{const b=blockMap[id];return b?`${id} 第${b.page}页：${b.text.slice(0,115)}`:`${id} 未找到`;}).join(' \n');
+        return `<div class="node-card" data-node="${esc(n.id)}"><h3>${esc(n.id)} ${esc(labels[n.category]||n.category)}</h3><label>技术内容</label><textarea class="node-text">${esc(n.text)}</textarea><label>原文块编号，用逗号分隔</label><input class="node-sources" value="${esc(n.source_ids.join(', '))}"><div class="evidence">${esc(snippets)}</div><button class="secondary small delete-node" data-delete="${esc(n.id)}" style="margin-top:9px">移除此项</button></div>`;
+      }).join('');
+      $('edgeDetails').hidden=false;
+      $('edgeList').innerHTML=state.graph.edges.map(e=>`<div class="source-item">${esc(e.source)} → ${esc(e.target)} · ${esc(e.relation)}</div>`).join('') || '<p class="muted">尚无关系。</p>';
+      $('saveGraphBtn').hidden=false;
+      refreshButtons();
+    }
+    function renderPlan() {
+      if (!state.plan || !state.graph) return;
+      warnings('planWarnings',state.plan.warnings);
+      const assignments=Object.fromEntries(state.plan.sections.flatMap(s=>s.node_ids.map(id=>[id,s.heading])));
+      const options=headings.filter(h=>state.plan.sections.some(s=>s.heading===h));
+      $('planRows').innerHTML=state.graph.nodes.map(n=>`<div class="plan-row" data-plan-node="${esc(n.id)}"><div><strong>${esc(n.id)} ${esc(labels[n.category])}</strong><br><span class="muted">${esc(n.text)}</span></div><select>${options.map(h=>`<option value="${esc(h)}" ${assignments[n.id]===h?'selected':''}>${esc(h)}</option>`).join('')}</select></div>`).join('');
+      $('savePlanBtn').hidden=false;
+      refreshButtons();
+    }
+    function renderDraft() {
+      if (!state.draft) {$('saveDraftBtn').hidden=true;$('draftPreview').innerHTML='';return;}
+      $('saveDraftBtn').hidden=false;
+      warnings('draftWarnings',[...state.draft.questions.map(x=>'待确认：'+x),...state.draft.warnings]);
+      $('draftPreview').innerHTML=`<h3>${esc(state.draft.title)}</h3>`+state.draft.sections.map(s=>`<div class="section-preview"><h3>${esc(s.heading)}</h3>${s.paragraphs.map((p,i)=>`<div class="paragraph"><div class="paragraph-content">${esc(p.text)}</div><span class="source-tag">依据 ${esc(p.source_ids.join('、'))}</span><details class="draft-editor"><summary>修改这一段文字</summary><textarea class="draft-text" data-heading="${esc(s.heading)}" data-paragraph="${i+1}">${esc(p.text)}</textarea></details></div>`).join('')||'<p class="muted">等待补充技术内容。</p>'}</div>`).join('');
+      $('downloads').hidden=false;
+      document.querySelectorAll('[data-kind]').forEach(a=>a.href=`/api/runs/${state.runId}/download/${a.dataset.kind}`);
+    }
+    function renderEvidence() {
+      if (!state.evidence) {
+        $('evidenceSummary').hidden=true;
+        $('candidateActions').hidden=true;
+        $('evidenceFindings').innerHTML='';
+        $('evidenceDownloads').hidden=true;
+        return;
+      }
+      const report=state.evidence;
+      const counts={supported:0,partial:0,unsupported:0,uncertain:0,confirmed:0,differs:0};
+      report.findings.forEach(item=>{counts[item.verdict]++;if(item.page_review==='matches')counts.confirmed++;if(item.page_review==='differs')counts.differs++;});
+      $('evidenceSummary').hidden=false;
+      $('evidenceSummary').textContent=`已核对 ${report.checked_units}/${report.total_units} 条原句，拆出 ${report.findings.length} 条技术主张。当前引用支持 ${counts.supported} 条；部分支持 ${counts.partial} 条；当前引用不足 ${counts.unsupported} 条；自动待复核 ${counts.uncertain} 条，其中页面已核对一致 ${counts.confirmed} 条、发现差异 ${counts.differs} 条。`;
+      const filter=$('evidenceFilter').value;
+      const items=report.findings.filter(item=>filter==='all'||(filter==='supported'?item.verdict==='supported':item.verdict!=='supported'&&item.page_review!=='matches'));
+      const verdicts={supported:'当前引用支持',partial:'部分支持',unsupported:'当前引用不足',uncertain:'待复核'};
+      $('evidenceFindings').innerHTML=items.map(item=>{
+        const quotes=item.evidence.map(q=>`<div class="quote"><button class="source-link" data-source-id="${esc(q.source_id)}">${esc(q.source_id)} · 第${q.page}页</button>${q.quote?`<br>${esc(q.quote)}`:''}${q.quote&&!q.exact_match?'<br><strong>引句未在原文块中逐字找到</strong>':''}</div>`).join('');
+        const candidates=(item.candidates||[]).map(c=>`<div class="candidate-row"><input type="checkbox" class="candidate-check" aria-label="选用${esc(c.source_id)}" data-heading="${esc(item.heading)}" data-paragraph="${item.paragraph}" data-source-id="${esc(c.source_id)}"><button class="source-link" data-source-id="${esc(c.source_id)}">候选 ${esc(c.source_id)} · 第${c.page}页</button><span class="muted">${esc(c.reason)}</span></div>`).join('');
+        const pages=[...new Set((item.evidence||[]).map(q=>q.page))];
+        const formula=(item.checks||[]).includes('formula_visual_review');
+        const reviewer=item.page_review_by==='codex'?'（Codex 页面核对）':item.page_review_by==='user'?'（用户确认）':'';
+        const pageReview=formula?`<div class="quote"><strong>页面核对：</strong>${item.page_review==='matches'?'已记录与原文一致':item.page_review==='differs'?'已记录存在差异':'尚未记录'}${reviewer} ${item.page_review_note?esc(item.page_review_note):''}<br>${pages.map(page=>`<a href="/api/runs/${state.runId}/source.pdf#page=${page}" target="_blank" rel="noopener">打开论文第${page}页</a>`).join('　')}<br><button class="secondary small page-review-btn" data-finding-id="${esc(item.id)}" data-decision="matches">对照后标记一致</button> <button class="secondary small page-review-btn" data-finding-id="${esc(item.id)}" data-decision="differs">记录差异</button></div>`:'';
+        return `<div class="evidence-item"><span class="verdict ${esc(item.verdict)}">${verdicts[item.verdict]}</span><strong>${esc(item.heading)}第${item.paragraph}段 · ${esc(item.id)}</strong><p>${esc(item.claim)}</p><p class="muted">${esc(item.reason)}</p>${quotes}${candidates}${pageReview}</div>`;
+      }).join('')||'<p class="muted">当前筛选条件下没有主张。</p>';
+      $('candidateActions').hidden=!items.some(item=>(item.candidates||[]).length);
+      $('evidenceDownloads').hidden=false;
+      document.querySelectorAll('[data-kind]').forEach(a=>a.href=`/api/runs/${state.runId}/download/${a.dataset.kind}`);
+    }
+    async function loadRun() {
+      try {
+        state.source=await api(`/api/runs/${state.runId}/data/source`);
+        renderSource();
+        for (const kind of ['graph','plan','draft','evidence']) {
+          try {state[kind]=await api(`/api/runs/${state.runId}/data/${kind}`);} catch {state[kind]=null;}
+        }
+        renderGraph();renderPlan();renderDraft();renderEvidence();refreshButtons();
+        const status=await api(`/api/runs/${state.runId}/status`);
+        if (['queued','running'].includes(status.state)) pollStage(status.stage);
+      } catch {localStorage.removeItem('patent-run-id');state.runId=null;refreshButtons();}
+    }
+    async function pollStage(stage) {
+      state.busy=true;refreshButtons();
+      while (state.runId) {
+        await sleep(1800);
+        let status;
+        try {status=await api(`/api/runs/${state.runId}/status`);} catch(e) {notice(e.message,'error');break;}
+        notice(status.message||'正在处理…',status.state==='error'?'error':'');
+        if (status.state==='error') break;
+        if (status.state==='done' && status.stage===stage) {
+          state[stage]=await api(`/api/runs/${state.runId}/data/${stage}`);
+          if(stage==='graph'){state.plan=null;state.draft=null;state.evidence=null;$('downloads').hidden=true;renderGraph();renderEvidence();}
+          if(stage==='plan'){state.draft=null;state.evidence=null;$('downloads').hidden=true;renderPlan();renderEvidence();}
+          if(stage==='draft'){state.evidence=null;renderDraft();renderEvidence();}
+          if(stage==='evidence')renderEvidence();
+          break;
+        }
+      }
+      state.busy=false;refreshButtons();
+    }
+    function config() {
+      return {provider:$('provider').value,base_url:$('baseUrl').value.trim(),model:$('model').value.trim(),api_key:$('apiKey').value,candidate_count:Number($('planCount').value),include_figures:false};
+    }
+    async function start(stage) {
+      try {
+        if (!state.runId) throw new Error('请先读取论文。');
+        if (stage==='draft' && !state.plan) throw new Error('请先生成提纲。');
+        if (stage==='evidence' && !state.draft) throw new Error('请先生成说明书草稿。');
+        await api(`/api/runs/${state.runId}/start/${stage}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(config())});
+        notice('任务已开始，请稍候。');
+        pollStage(stage);
+      } catch(e) {notice(e.message,'error');}
+    }
+    $('uploadBtn').onclick=async()=>{
+      const file=$('pdfFile').files[0];if(!file){notice('请选择 PDF 文件。','error');return;}
+      try {state.busy=true;refreshButtons();const form=new FormData();form.append('file',file);const result=await api('/api/runs',{method:'POST',body:form});state.runId=result.run_id;localStorage.setItem('patent-run-id',state.runId);state.graph=null;state.plan=null;state.draft=null;state.evidence=null;$('downloads').hidden=true;renderEvidence();await loadRun();notice('论文已读取，可以提取技术概念。');}
+      catch(e){notice(e.message,'error');}finally{state.busy=false;refreshButtons();}
+    };
+    $('graphBtn').onclick=()=>start('graph');$('planBtn').onclick=()=>start('plan');$('draftBtn').onclick=()=>start('draft');$('evidenceBtn').onclick=()=>start('evidence');
+    $('saveDraftBtn').onclick=async()=>{
+      if(!state.draft)return;
+      const copy=structuredClone(state.draft);
+      for(const area of document.querySelectorAll('.draft-text')){
+        const section=copy.sections.find(item=>item.heading===area.dataset.heading);
+        section.paragraphs[Number(area.dataset.paragraph)-1].text=area.value.trim();
+      }
+      try{const result=await api(`/api/runs/${state.runId}/draft`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(copy)});state.draft=result.draft;state.evidence=null;renderDraft();renderEvidence();notice('草稿修改已保存，请重新运行证据核对。');}
+      catch(e){notice(e.message,'error');}
+    };
+    $('evidenceFilter').onchange=renderEvidence;
+    $('evidenceFindings').onclick=async event=>{
+      const review=event.target.closest('.page-review-btn');
+      if(review){
+        const decision=review.dataset.decision;
+        const note=decision==='differs'?window.prompt('请写明公式或符号与论文页面的具体差异：'):'';
+        if(decision==='differs' && !note?.trim())return;
+        try{const result=await api(`/api/runs/${state.runId}/evidence/page-review`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({finding_id:review.dataset.findingId,decision,note})});state.evidence=result.evidence;renderEvidence();notice('页面核对结果已保存。');}
+        catch(e){notice(e.message,'error');}
+        return;
+      }
+      const link=event.target.closest('.source-link');if(!link)return;
+      $('sourceDetails').open=true;
+      $('sourceSearch').value=link.dataset.sourceId;
+      searchSource();
+      $('sourceDetails').scrollIntoView({behavior:'smooth',block:'start'});
+    };
+    $('applyCitationsBtn').onclick=async()=>{
+      const selected=[...document.querySelectorAll('.candidate-check:checked')];
+      if(!selected.length){notice('请先查看原文，并勾选要加入的候选。','error');return;}
+      const grouped=new Map();
+      selected.forEach(box=>{const key=`${box.dataset.heading}|${box.dataset.paragraph}`;if(!grouped.has(key))grouped.set(key,{heading:box.dataset.heading,paragraph:Number(box.dataset.paragraph),source_ids:[]});grouped.get(key).source_ids.push(box.dataset.sourceId);});
+      try {
+        const result=await api(`/api/runs/${state.runId}/draft/citations`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({updates:[...grouped.values()].map(item=>({...item,source_ids:unique(item.source_ids)}))})});
+        state.draft=result.draft;state.evidence=null;renderDraft();renderEvidence();notice('原文引用已加入草稿，请重新运行证据核对。');
+      } catch(e){notice(e.message,'error');}
+    };
+    function collectGraphEdits() {
+      for(const card of document.querySelectorAll('.node-card')) {
+        const node=state.graph.nodes.find(n=>n.id===card.dataset.node);
+        if(!node)continue;
+        node.text=card.querySelector('.node-text').value.trim();
+        node.source_ids=unique(card.querySelector('.node-sources').value.split(/[,，\s]+/).map(x=>x.trim()).filter(Boolean));
+      }
+    }
+    $('saveGraphBtn').onclick=async()=>{
+      try {collectGraphEdits();const copy=structuredClone(state.graph);
+        await api(`/api/runs/${state.runId}/graph`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(copy)});state.graph=copy;state.plan=null;state.draft=null;state.evidence=null;$('downloads').hidden=true;renderGraph();renderEvidence();notice('概念修改已保存，请重新生成提纲。');}
+      catch(e){notice(e.message,'error');}
+    };
+    $('addNodeBtn').onclick=()=>{
+      if(!state.graph)return;
+      collectGraphEdits();
+      const category=$('newCategory').value,text=$('newText').value.trim();
+      const sources=unique($('newSources').value.split(/[,，\s]+/).map(x=>x.trim()).filter(Boolean));
+      const valid=new Set(state.source.blocks.map(b=>b.id));
+      if(!text||!sources.length||sources.some(s=>!valid.has(s))){notice('请填写技术内容和有效的原文块编号。','error');return;}
+      const prefix={Field:'F',TechProblem:'P',PriorArt:'A',Novelty:'N',Solution:'S',Implementation:'I',Effects:'E',Embodiment:'M'}[category];
+      let index=1;while(state.graph.nodes.some(n=>n.id===prefix+index))index++;
+      state.graph.nodes.push({id:prefix+index,category,text,source_ids:sources});
+      $('newText').value='';$('newSources').value='';renderGraph();notice('概念已加入，请点击“保存修改”。');
+    };
+    $('graphCards').onclick=event=>{
+      const button=event.target.closest('.delete-node');if(!button||!state.graph)return;
+      collectGraphEdits();const id=button.dataset.delete;
+      state.graph.nodes=state.graph.nodes.filter(n=>n.id!==id);
+      state.graph.edges=state.graph.edges.filter(e=>e.source!==id&&e.target!==id);
+      renderGraph();notice('概念已移除，请点击“保存修改”。');
+    };
+    $('savePlanBtn').onclick=async()=>{
+      try {const copy=structuredClone(state.plan);copy.sections.forEach(s=>s.node_ids=[]);for(const row of document.querySelectorAll('.plan-row')){const heading=row.querySelector('select').value;copy.sections.find(s=>s.heading===heading).node_ids.push(row.dataset.planNode);}
+        await api(`/api/runs/${state.runId}/plan`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(copy)});state.plan=copy;state.draft=null;state.evidence=null;$('downloads').hidden=true;renderPlan();renderEvidence();notice('提纲调整已保存，可以生成草稿。');}
+      catch(e){notice(e.message,'error');}
+    };
+    $('sourceSearch').oninput=searchSource;
+    $('provider').onchange=()=>{const ollama=$('provider').value==='ollama';$('apiKey').disabled=ollama;$('baseUrl').value=ollama?'http://127.0.0.1:11434':'https://api.deepseek.com';$('model').value=ollama?'qwen3:4b':'deepseek-flash';};
+    const linkedRun=new URLSearchParams(window.location.search).get('run');
+    state.runId=linkedRun||localStorage.getItem('patent-run-id');
+    if(linkedRun)localStorage.setItem('patent-run-id',linkedRun);
+    if(state.runId)loadRun();else refreshButtons();
+  </script>
+</body>
+</html>
